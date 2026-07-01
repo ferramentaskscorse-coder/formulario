@@ -3,391 +3,875 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vamos organizar a gestão do seu negócio</title>
+<title>Mapa do Caos — KlareIA</title>
 <style>
-  :root{
-    --ink:#1F2421;
-    --plum:#2C4313;
-    --plum-light:#4F6B27;
-    --coral:#E8633C;
-    --coral-soft:#E9EFDE;
-    --cream:#FAF7F2;
-    --line:#E3DCD3;
-    --ok:#2E7D5B;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--cream);
-    color:var(--ink);
-    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  .wrap{
-    max-width:460px;
-    margin:0 auto;
-    padding:28px 20px 60px;
-  }
-  .eyebrow{
-    font-size:13px;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-    color:var(--coral);
-    font-weight:700;
-    margin-bottom:8px;
-  }
-  h1{
-    font-family:Georgia, 'Times New Roman', serif;
-    font-size:28px;
-    line-height:1.25;
-    color:var(--plum);
-    margin:0 0 10px;
-  }
-  .sub{
-    font-size:15px;
-    line-height:1.55;
-    color:#4B453F;
-    margin-bottom:28px;
-  }
-  .step-indicator{
-    display:flex;
-    gap:6px;
-    margin-bottom:24px;
-  }
-  .step-dot{
-    height:4px;
-    flex:1;
-    background:var(--line);
-    border-radius:4px;
-    transition:background .25s;
-  }
-  .step-dot.active{ background:var(--plum); }
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
-  form{ display:flex; flex-direction:column; gap:18px; }
-  label{
-    display:block;
-    font-size:13.5px;
-    font-weight:600;
-    color:#3A3A3A;
-    margin-bottom:6px;
+  :root {
+    --preto: #0F0F0F;
+    --branco: #F9F7F4;
+    --dourado: #C9A84C;
+    --dourado-claro: #F0DFA0;
+    --cinza-suave: #E8E5DF;
+    --cinza-medio: #9A9590;
+    --cinza-escuro: #3A3835;
+    --verde-ok: #4A7C59;
+    --erro: #C0392B;
   }
-  .hint{
-    font-size:12.5px;
-    color:#8A8378;
-    margin-top:4px;
-  }
-  input[type="text"], input[type="email"], input[type="tel"], textarea{
-    width:100%;
-    border:1.5px solid var(--line);
-    border-radius:10px;
-    padding:12px 14px;
-    font-size:15px;
-    background:#fff;
-    color:var(--ink);
-    font-family:inherit;
-  }
-  textarea{ resize:vertical; min-height:78px; }
-  input:focus, textarea:focus, .choice input:focus + span{
-    outline:none;
-    border-color:var(--plum);
-    box-shadow:0 0 0 3px var(--coral-soft);
-  }
-  fieldset{ border:none; padding:0; margin:0; }
-  .choices{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-  }
-  .choice{
-    position:relative;
-  }
-  .choice input{
-    position:absolute;
-    opacity:0;
-    width:0; height:0;
-  }
-  .choice span{
-    display:block;
-    border:1.5px solid var(--line);
-    border-radius:10px;
-    padding:11px 14px;
-    font-size:14.5px;
-    cursor:pointer;
-    background:#fff;
-    transition:border-color .15s, background .15s;
-  }
-  .choice input:checked + span{
-    border-color:var(--plum);
-    background:var(--coral-soft);
-    font-weight:600;
-    color:var(--plum);
-  }
-  .outro-box{ margin-top:10px; display:none; }
-  .outro-box.show{ display:block; }
 
-  button[type="submit"]{
-    margin-top:8px;
-    background:var(--plum);
-    color:#fff;
-    border:none;
-    border-radius:10px;
-    padding:15px;
-    font-size:15.5px;
-    font-weight:700;
-    cursor:pointer;
-    transition:background .15s, transform .1s;
-  }
-  button[type="submit"]:hover{ background:var(--plum-light); }
-  button[type="submit"]:active{ transform:scale(.99); }
-  button[type="submit"]:disabled{ opacity:.6; cursor:not-allowed; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  .error-msg{
-    color:#B3261E;
-    font-size:13px;
-    margin-top:4px;
-    display:none;
-  }
-  .error-msg.show{ display:block; }
+  html { scroll-behavior: smooth; }
 
-  .success{
-    text-align:center;
-    padding:40px 10px;
+  body {
+    background: var(--branco);
+    font-family: 'Inter', sans-serif;
+    color: var(--preto);
+    min-height: 100vh;
   }
-  .success .icon{
-    width:56px; height:56px;
-    background:var(--ok);
-    border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    margin:0 auto 18px;
-  }
-  .success .icon svg{ width:26px; height:26px; stroke:#fff; }
-  .success h2{
-    font-family:Georgia, serif;
-    color:var(--plum);
-    font-size:22px;
-    margin:0 0 10px;
-  }
-  .success p{ color:#4B453F; font-size:15px; line-height:1.5; }
 
-  .hidden{ display:none; }
+  /* BARRA TOPO */
+  .barra-topo {
+    height: 4px;
+    background: linear-gradient(90deg, var(--dourado), var(--dourado-claro), var(--dourado));
+  }
 
-  footer{
-    text-align:center;
-    font-size:12px;
-    color:#A39C8F;
-    margin-top:34px;
+  /* HERO */
+  .hero {
+    background: #4f2c1d;
+    padding: 48px 24px 40px;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #BE4D00;
+    margin-bottom: 16px;
+  }
+
+  .hero-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 6vw, 40px);
+    font-weight: 700;
+    color: white;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.6;
+    max-width: 460px;
+    margin: 0 auto 32px;
+  }
+
+  /* PROGRESSO */
+  .progresso-container {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .progresso-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .progresso-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .progresso-label.ativo { color: #BE4D00; }
+
+  .progresso-barra {
+    height: 2px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .progresso-fill {
+    height: 100%;
+    background: #BE4D00;
+    border-radius: 1px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* CONTAINER PRINCIPAL */
+  .container {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* BLOCOS DDD */
+  .bloco {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .bloco.ativo { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bloco-header {
+    margin-bottom: 40px;
+  }
+
+  .bloco-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dourado);
+    margin-bottom: 12px;
+  }
+
+  .bloco-tag.laranja {
+    color: #BE4D00;
+  }
+
+  .bloco-tag::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: currentColor;
+  }
+
+  .bloco-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--preto);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .bloco-descricao {
+    font-size: 14px;
+    color: var(--cinza-medio);
+    line-height: 1.6;
+  }
+
+  /* PERGUNTAS */
+  .pergunta {
+    margin-bottom: 32px;
+  }
+
+  .pergunta-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--cinza-escuro);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .pergunta-hint {
+    font-size: 12px;
+    color: var(--cinza-medio);
+    margin-bottom: 12px;
+    display: block;
+    font-style: italic;
+  }
+
+  /* INPUTS */
+  input[type="text"],
+  input[type="tel"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 14px 16px;
+    background: white;
+    border: 1.5px solid var(--cinza-suave);
+    border-radius: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--preto);
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+
+  input[type="text"]:focus,
+  input[type="tel"]:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--dourado);
+  }
+
+  input.erro,
+  textarea.erro,
+  select.erro {
+    border-color: var(--erro);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .msg-erro {
+    font-size: 12px;
+    color: var(--erro);
+    margin-top: 6px;
+    display: none;
+  }
+
+  .msg-erro.visivel { display: block; }
+
+  /* OPÇÕES DE ESCOLHA */
+  .opcoes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .opcao {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: white;
+    border: 1.5px solid var(--cinza-suave);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    color: var(--cinza-escuro);
+    font-weight: 400;
+  }
+
+  .opcao:hover {
+    border-color: var(--dourado);
+    color: var(--preto);
+  }
+
+  .opcao.selecionada {
+    border-color: var(--dourado);
+    background: #FDF8EC;
+    color: var(--preto);
+    font-weight: 500;
+  }
+
+  .opcao-radio {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--cinza-suave);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .opcao.selecionada .opcao-radio {
+    border-color: var(--dourado);
+    background: var(--dourado);
+  }
+
+  .opcao.selecionada .opcao-radio::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  /* BOTÕES */
+  .botoes {
+    display: flex;
+    gap: 12px;
+    margin-top: 40px;
+  }
+
+  .btn-voltar {
+    padding: 14px 24px;
+    background: transparent;
+    border: 1.5px solid var(--cinza-suave);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cinza-medio);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-voltar:hover {
+    border-color: var(--cinza-escuro);
+    color: var(--cinza-escuro);
+  }
+
+  .btn-avancar {
+    flex: 1;
+    padding: 16px 24px;
+    background: var(--preto);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .btn-avancar:hover { background: var(--cinza-escuro); }
+  .btn-avancar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-avancar.carregando::after {
+    content: '';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+  /* TELA DE SUCESSO */
+  .sucesso {
+    display: none;
+    text-align: center;
+    padding: 60px 24px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .sucesso.visivel { display: block; }
+
+  .sucesso-icone {
+    width: 64px;
+    height: 64px;
+    background: var(--preto);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+  }
+
+  .sucesso-icone svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--dourado);
+    stroke-width: 2;
+    fill: none;
+  }
+
+  .sucesso-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--preto);
+    margin-bottom: 12px;
+  }
+
+  .sucesso-sub {
+    font-size: 15px;
+    color: var(--cinza-medio);
+    line-height: 1.6;
+    max-width: 360px;
+    margin: 0 auto 32px;
+  }
+
+  .sucesso-prazo {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--preto);
+    color: var(--dourado);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* DIVISOR */
+  .divisor {
+    height: 1px;
+    background: var(--cinza-suave);
+    margin: 32px 0;
+  }
+
+  /* NOME NO FORMULÁRIO */
+  .form-nome {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--cinza-medio);
+    text-align: center;
+    padding: 16px 0 8px;
+  }
+
+  @media (max-width: 480px) {
+    .hero { padding: 36px 20px 32px; }
+    .container { padding: 36px 20px 60px; }
+    .bloco-titulo { font-size: 22px; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div id="formView">
-    <p class="eyebrow">Karen Scorse</p>
-    <h1>Consultoria KlareIA</h1>
-    <p class="sub">Responda em menos de 1 minuto. Assim que você enviar, eu te chamo no WhatsApp para conversarmos.</p>
+<div class="barra-topo"></div>
 
-    <form id="leadForm" novalidate>
-      <div>
-        <label for="nome">Seu nome</label>
-        <input type="text" id="nome" name="nome" required>
-        <p class="error-msg" data-for="nome">Conta seu nome pra gente, por favor.</p>
-      </div>
+<div class="hero">
+  <div class="hero-eyebrow">KlareIA · O Mapa</div>
+  <h1 class="hero-titulo">Vamos entender<br>o seu negócio.</h1>
+  <p class="hero-sub">Responda com calma — não tem resposta certa ou errada. Quanto mais honesta você for, mais certeiro vai ser o diagnóstico.</p>
 
-      <div>
-        <label for="whatsapp">WhatsApp (com DDD)</label>
-        <input type="tel" id="whatsapp" name="whatsapp" placeholder="(11) 91234-5678" required>
-        <p class="error-msg" data-for="whatsapp">Preciso do seu WhatsApp pra te chamar.</p>
-      </div>
-
-      <div>
-        <label for="email">E-mail</label>
-        <input type="email" id="email" name="email" required>
-        <p class="error-msg" data-for="email">Coloca um e-mail válido.</p>
-      </div>
-
-      <div>
-        <label>Como você chegou até mim?</label>
-        <fieldset>
-          <div class="choices" id="origemChoices">
-            <label class="choice"><input type="radio" name="origem" value="Instagram"><span>Instagram</span></label>
-            <label class="choice"><input type="radio" name="origem" value="Indicação de alguém"><span>Indicação de alguém</span></label>
-            <label class="choice"><input type="radio" name="origem" value="Outro"><span>Outro</span></label>
-          </div>
-        </fieldset>
-        <div class="outro-box" id="origemOutroBox">
-          <input type="text" id="origemOutro" placeholder="Conta rapidinho como foi">
-        </div>
-        <p class="error-msg" data-for="origem">Escolhe uma opção aqui.</p>
-      </div>
-
-      <div>
-        <label for="nicho">Qual a área de atuação / nicho do seu negócio?</label>
-        <input type="text" id="nicho" name="nicho" placeholder="Ex: confeitaria, estética, clínica de estética...">
-      </div>
-
-      <div>
-        <label for="dificuldade">Qual a maior dificuldade que trava o seu negócio hoje?</label>
-        <textarea id="dificuldade" name="dificuldade" placeholder="Escreve com suas palavras, sem pressa." required></textarea>
-        <p class="error-msg" data-for="dificuldade">Me conta um pouco sobre essa dificuldade.</p>
-      </div>
-
-      <div>
-        <label>Quanto você imagina investir numa solução agora?</label>
-        <fieldset>
-          <div class="choices" id="investimentoChoices">
-            <label class="choice"><input type="radio" name="investimento" value="Até R$1.000"><span>Até R$1.000</span></label>
-            <label class="choice"><input type="radio" name="investimento" value="R$1.000 a R$2.500"><span>R$1.000 a R$2.500</span></label>
-            <label class="choice"><input type="radio" name="investimento" value="Acima de R$2.500"><span>Acima de R$2.500</span></label>
-          </div>
-        </fieldset>
-        <p class="error-msg" data-for="investimento">Escolhe uma faixa, mesmo que seja só um chute.</p>
-      </div>
-
-      <button type="submit" id="submitBtn">Enviar e falar com a Ka</button>
-    </form>
-  </div>
-
-  <div id="successView" class="success hidden">
-    <div class="icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  <div class="progresso-container">
+    <div class="progresso-labels">
+      <span class="progresso-label ativo" id="label-dor">Dor</span>
+      <span class="progresso-label" id="label-dado">Dado</span>
+      <span class="progresso-label" id="label-decisao">Decisão</span>
     </div>
-    <h2>Recebi suas respostas!</h2>
-    <p>Em breve te chamo no WhatsApp pra conversarmos sobre o seu negócio. Enquanto isso, me segue no Instagram pra ver mais conteúdo de gestão.</p>
+    <div class="progresso-barra">
+      <div class="progresso-fill" id="progresso-fill"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- BLOCO 0: IDENTIFICAÇÃO -->
+  <div class="bloco ativo" id="bloco-0">
+    <div class="bloco-header">
+      <div class="bloco-tag laranja">Antes de começar</div>
+      <h2 class="bloco-titulo">Como posso te chamar?</h2>
+      <p class="bloco-descricao">Preciso de algumas informações pra fazer o diagnóstico chegar até você.</p>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label" for="nome">Seu nome</label>
+      <input type="text" id="nome" placeholder="Como você gostaria de ser chamada" />
+      <span class="msg-erro" id="erro-nome">Por favor, informe seu nome.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label" for="whatsapp">Seu WhatsApp</label>
+      <span class="pergunta-hint">É por aqui que você vai receber o diagnóstico em até 48h.</span>
+      <input type="tel" id="whatsapp" placeholder="(11) 99999-9999" />
+      <span class="msg-erro" id="erro-whatsapp">Por favor, informe seu WhatsApp.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label" for="negocio">Qual é o seu negócio?</label>
+      <input type="text" id="negocio" placeholder="Ex: doceria, estúdio de estética, costura..." />
+      <span class="msg-erro" id="erro-negocio">Por favor, informe seu negócio.</span>
+    </div>
+
+    <div class="botoes">
+      <button class="btn-avancar" onclick="avancar(0)">Continuar →</button>
+    </div>
   </div>
 
-  <footer>Ka Scorse · Gestão com IA para quem empreende</footer>
+  <!-- BLOCO 1: DOR -->
+  <div class="bloco" id="bloco-1">
+    <div class="bloco-header">
+      <div class="bloco-tag">D · Dor</div>
+      <h2 class="bloco-titulo">O que está pesando no seu negócio agora?</h2>
+      <p class="bloco-descricao">Conta com suas palavras — sem filtro.</p>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label" for="dor-descricao">Como você descreveria a maior dificuldade da gestão do seu negócio hoje?</label>
+      <textarea id="dor-descricao" placeholder="Escreve aqui, sem pressa..."></textarea>
+      <span class="msg-erro" id="erro-dor-descricao">Conta um pouco sobre sua dificuldade.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">Isso está te custando mais em:</label>
+      <div class="opcoes" id="opcoes-custo">
+        <div class="opcao" onclick="selecionarOpcao('opcoes-custo', this, 'custo')">
+          <div class="opcao-radio"></div>
+          Tempo — faço tudo na mão e nunca sobra tempo
+        </div>
+        <div class="opcao" onclick="selecionarOpcao('opcoes-custo', this, 'custo')">
+          <div class="opcao-radio"></div>
+          Dinheiro — não sei se estou ganhando ou perdendo
+        </div>
+        <div class="opcao" onclick="selecionarOpcao('opcoes-custo', this, 'custo')">
+          <div class="opcao-radio"></div>
+          Energia — me sinto sobrecarregada e sem clareza
+        </div>
+        <div class="opcao" onclick="selecionarOpcao('opcoes-custo', this, 'custo')">
+          <div class="opcao-radio"></div>
+          Os três ao mesmo tempo
+        </div>
+      </div>
+      <span class="msg-erro" id="erro-custo">Selecione uma opção.</span>
+    </div>
+
+    <div class="botoes">
+      <button class="btn-voltar" onclick="voltar(1)">← Voltar</button>
+      <button class="btn-avancar" onclick="avancar(1)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: DADO -->
+  <div class="bloco" id="bloco-2">
+    <div class="bloco-header">
+      <div class="bloco-tag">D · Dado</div>
+      <h2 class="bloco-titulo">O que você já registra?</h2>
+      <p class="bloco-descricao">Quase todo negócio já tem dado — só que desorganizado. Vamos encontrar o seu.</p>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">Você registra as informações do seu negócio em algum lugar hoje?</label>
+      <div class="opcoes" id="opcoes-registra">
+        <div class="opcao" onclick="selecionarOpcao('opcoes-registra', this, 'registra')">
+          <div class="opcao-radio"></div>
+          Sim, tenho o costume de anotar
+        </div>
+        <div class="opcao" onclick="selecionarOpcao('opcoes-registra', this, 'registra')">
+          <div class="opcao-radio"></div>
+          Às vezes, mas não é consistente
+        </div>
+        <div class="opcao" onclick="selecionarOpcao('opcoes-registra', this, 'registra')">
+          <div class="opcao-radio"></div>
+          Não, guardo tudo na cabeça
+        </div>
+      </div>
+      <span class="msg-erro" id="erro-registra">Selecione uma opção.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">Se registra, onde fica esse dado?</label>
+      <span class="pergunta-hint">Pode marcar mais de um.</span>
+      <div class="opcoes" id="opcoes-onde" data-multiplo="true">
+        <div class="opcao" onclick="selecionarMultiplo('opcoes-onde', this)">
+          <div class="opcao-radio"></div>
+          Caderno ou papel
+        </div>
+        <div class="opcao" onclick="selecionarMultiplo('opcoes-onde', this)">
+          <div class="opcao-radio"></div>
+          Planilha (Excel ou Google Sheets)
+        </div>
+        <div class="opcao" onclick="selecionarMultiplo('opcoes-onde', this)">
+          <div class="opcao-radio"></div>
+          Aplicativo ou sistema
+        </div>
+        <div class="opcao" onclick="selecionarMultiplo('opcoes-onde', this)">
+          <div class="opcao-radio"></div>
+          Nota no celular ou WhatsApp
+        </div>
+        <div class="opcao" onclick="selecionarMultiplo('opcoes-onde', this)">
+          <div class="opcao-radio"></div>
+          Não registro em lugar nenhum
+        </div>
+      </div>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">Você consegue responder agora: quanto sobrou no seu negócio no mês passado?</label>
+      <div class="opcoes" id="opcoes-sobrou">
+        <div class="opcao" onclick="selecionarOpcao('opcoes-sobrou', this, 'sobrou')">
+          <div class="opcao-radio"></div>
+          Sim, sei exatamente o valor
+        </div>
+        <div class="opcao" onclick="selecionarOpcao('opcoes-sobrou', this, 'sobrou')">
+          <div class="opcao-radio"></div>
+          Tenho uma ideia, mas não tenho certeza
+        </div>
+        <div class="opcao" onclick="selecionarOpcao('opcoes-sobrou', this, 'sobrou')">
+          <div class="opcao-radio"></div>
+          Não sei — não tenho esse controle
+        </div>
+      </div>
+      <span class="msg-erro" id="erro-sobrou">Selecione uma opção.</span>
+    </div>
+
+    <div class="botoes">
+      <button class="btn-voltar" onclick="voltar(2)">← Voltar</button>
+      <button class="btn-avancar" onclick="avancar(2)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DECISÃO -->
+  <div class="bloco" id="bloco-3">
+    <div class="bloco-header">
+      <div class="bloco-tag">D · Decisão</div>
+      <h2 class="bloco-titulo">Como você decide?</h2>
+      <p class="bloco-descricao">Essa é a parte mais importante. Responde com honestidade.</p>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">Quando você precisa tomar uma decisão no negócio, você se baseia em quê?</label>
+      <div class="opcoes" id="opcoes-decisao">
+        <div class="opcao" onclick="selecionarOpcao('opcoes-decisao', this, 'decisao')">
+          <div class="opcao-radio"></div>
+          Em números e registros — tenho dados pra decidir
+        </div>
+        <div class="opcao" onclick="selecionarOpcao('opcoes-decisao', this, 'decisao')">
+          <div class="opcao-radio"></div>
+          Na experiência e intuição — conheço meu negócio
+        </div>
+        <div class="opcao" onclick="selecionarOpcao('opcoes-decisao', this, 'decisao')">
+          <div class="opcao-radio"></div>
+          No "eu acho que" — sem muita certeza
+        </div>
+        <div class="opcao" onclick="selecionarOpcao('opcoes-decisao', this, 'decisao')">
+          <div class="opcao-radio"></div>
+          Evito decidir — fico travada
+        </div>
+      </div>
+      <span class="msg-erro" id="erro-decisao">Selecione uma opção.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label" for="decisao-travada">Qual decisão você está travada pra tomar hoje?</label>
+      <span class="pergunta-hint">Pode ser qualquer coisa — preço, contratação, produto, investimento...</span>
+      <textarea id="decisao-travada" placeholder="Conta aqui..."></textarea>
+      <span class="msg-erro" id="erro-decisao-travada">Conta sobre a decisão que está te travando.</span>
+    </div>
+
+    <div class="botoes">
+      <button class="btn-voltar" onclick="voltar(3)">← Voltar</button>
+      <button class="btn-avancar" id="btn-enviar" onclick="enviar()">Enviar meu Mapa →</button>
+    </div>
+  </div>
+
+  <!-- SUCESSO -->
+  <div class="sucesso" id="sucesso">
+    <div class="sucesso-icone">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </div>
+    <h2 class="sucesso-titulo">Recebido! 🤍</h2>
+    <p class="sucesso-sub">Já tenho suas respostas. Agora vou analisar o seu negócio com cuidado e em até 48h úteis você recebe o diagnóstico no WhatsApp.</p>
+    <div class="sucesso-prazo">Prazo: até 48h úteis via WhatsApp</div>
+    <div class="divisor"></div>
+    <p style="font-size:13px; color: var(--cinza-medio); line-height: 1.6;">Fique de olho no WhatsApp — o diagnóstico chega em áudio + PDF, com o que encontrei e o que você pode fazer primeiro.</p>
+  </div>
+
 </div>
+
+<div class="form-nome">KlareIA · Karen Scorse</div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, collection, addDoc, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyA4a47SVBcyC2oC2S0AgzYVVPdPpXVrPMw",
+    apiKey: "AIzaSyDummy-replace-with-real-key",
     authDomain: "formularioentrada.firebaseapp.com",
     projectId: "formularioentrada",
-    storageBucket: "formularioentrada.firebasestorage.app",
-    messagingSenderId: "719149040677",
-    appId: "1:719149040677:web:47e65c4ba4a93422766bcc"
+    storageBucket: "formularioentrada.appspot.com",
+    messagingSenderId: "000000000000",
+    appId: "1:000000000000:web:000000000000000000"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const form = document.getElementById('leadForm');
-  const submitBtn = document.getElementById('submitBtn');
-  const origemOutroBox = document.getElementById('origemOutroBox');
-  const origemOutroInput = document.getElementById('origemOutro');
-  const nomeInput = document.getElementById('nome');
-  const whatsappInput = document.getElementById('whatsapp');
+  window._db = db;
+  window._partialId = null;
+  window._bloco = 0;
 
-  // --- Captura parcial: salva nome + WhatsApp mesmo se a pessoa não terminar o formulário ---
-  let partialSaved = false;
-  let partialDocId = null;
-  let finalSubmitted = false;
-
-  async function savePartialLead(){
-    if(finalSubmitted) return; // já enviou completo, não precisa de parcial
-    const nome = nomeInput.value.trim();
-    const whatsapp = whatsappInput.value.trim();
-    if(!nome || !whatsapp) return; // só salva quando os dois estiverem preenchidos
+  // Captura parcial quando sai da página
+  window.addEventListener('beforeunload', async () => {
+    const nome = document.getElementById('nome').value.trim();
+    const whatsapp = document.getElementById('whatsapp').value.trim();
+    if (!nome || !whatsapp) return;
+    if (window._bloco >= 3) return; // já enviou completo
 
     try {
-      if(!partialSaved){
-        const docRef = await addDoc(collection(db, 'leads_parciais'), {
-          nome,
-          whatsapp,
-          status: 'incompleto',
-          criadoEm: serverTimestamp()
+      if (!window._partialId) {
+        const ref = await addDoc(collection(db, 'leads_parciais'), {
+          nome, whatsapp,
+          negocio: document.getElementById('negocio').value.trim(),
+          origem: 'mapa-do-caos',
+          bloco_saiu: window._bloco,
+          timestamp: serverTimestamp()
         });
-        partialDocId = docRef.id;
-        partialSaved = true;
-      } else if(partialDocId){
-        // atualiza caso a pessoa corrija nome/whatsapp antes de sair
-        await updateDoc(doc(db, 'leads_parciais', partialDocId), { nome, whatsapp });
+        window._partialId = ref.id;
       }
-    } catch(err){
-      console.error('Falha ao salvar lead parcial', err);
-    }
-  }
-
-  // dispara quando a pessoa sai do campo whatsapp (já tendo preenchido o nome)
-  whatsappInput.addEventListener('blur', savePartialLead);
-  // dispara também se a pessoa sair da página/aba sem terminar
-  document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState === 'hidden') savePartialLead();
-  });
-  window.addEventListener('beforeunload', savePartialLead);
-
-  document.getElementById('origemChoices').addEventListener('change', (e) => {
-    if(e.target.value === 'Outro'){
-      origemOutroBox.classList.add('show');
-    } else {
-      origemOutroBox.classList.remove('show');
-    }
+    } catch(e) { console.log(e); }
   });
 
-  function clearErrors(){
-    document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('show'));
+  // Captura parcial ao preencher nome + whatsapp
+  document.getElementById('whatsapp').addEventListener('blur', async () => {
+    const nome = document.getElementById('nome').value.trim();
+    const whatsapp = document.getElementById('whatsapp').value.trim();
+    if (!nome || !whatsapp || window._partialId) return;
+    try {
+      const ref = await addDoc(collection(db, 'leads_parciais'), {
+        nome, whatsapp,
+        negocio: document.getElementById('negocio').value.trim(),
+        origem: 'mapa-do-caos',
+        bloco_saiu: 0,
+        timestamp: serverTimestamp()
+      });
+      window._partialId = ref.id;
+    } catch(e) { console.log(e); }
+  });
+
+  window.selecionarOpcao = function(grupoId, el, campo) {
+    const grupo = document.getElementById(grupoId);
+    grupo.querySelectorAll('.opcao').forEach(o => o.classList.remove('selecionada'));
+    el.classList.add('selecionada');
+    el.dataset.campo = campo;
+    const erro = document.getElementById('erro-' + campo);
+    if (erro) erro.classList.remove('visivel');
+  };
+
+  window.selecionarMultiplo = function(grupoId, el) {
+    el.classList.toggle('selecionada');
+  };
+
+  window.avancar = function(blocoAtual) {
+    if (!validar(blocoAtual)) return;
+    const proximo = blocoAtual + 1;
+    document.getElementById('bloco-' + blocoAtual).classList.remove('ativo');
+    document.getElementById('bloco-' + proximo).classList.add('ativo');
+    window._bloco = proximo;
+    atualizarProgresso(proximo);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  window.voltar = function(blocoAtual) {
+    const anterior = blocoAtual - 1;
+    document.getElementById('bloco-' + blocoAtual).classList.remove('ativo');
+    document.getElementById('bloco-' + anterior).classList.add('ativo');
+    window._bloco = anterior;
+    atualizarProgresso(anterior);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  function atualizarProgresso(bloco) {
+    const pcts = [0, 33, 66, 100];
+    document.getElementById('progresso-fill').style.width = pcts[bloco] + '%';
+    ['dor','dado','decisao'].forEach((l, i) => {
+      const el = document.getElementById('label-' + l);
+      el.classList.toggle('ativo', bloco >= i + 1);
+    });
   }
 
-  function showError(field){
-    const el = document.querySelector(`.error-msg[data-for="${field}"]`);
-    if(el) el.classList.add('show');
-  }
-
-  function validate(data){
+  function validar(bloco) {
     let ok = true;
-    if(!data.nome.trim()){ showError('nome'); ok = false; }
-    if(!data.whatsapp.trim()){ showError('whatsapp'); ok = false; }
-    if(!data.email.trim() || !data.email.includes('@')){ showError('email'); ok = false; }
-    if(!data.origem){ showError('origem'); ok = false; }
-    if(!data.dificuldade.trim()){ showError('dificuldade'); ok = false; }
-    if(!data.investimento){ showError('investimento'); ok = false; }
+
+    if (bloco === 0) {
+      const nome = document.getElementById('nome').value.trim();
+      const wpp = document.getElementById('whatsapp').value.trim();
+      const neg = document.getElementById('negocio').value.trim();
+      if (!nome) { mostrarErro('nome'); ok = false; }
+      if (!wpp) { mostrarErro('whatsapp'); ok = false; }
+      if (!neg) { mostrarErro('negocio'); ok = false; }
+    }
+
+    if (bloco === 1) {
+      const dor = document.getElementById('dor-descricao').value.trim();
+      const custo = document.querySelector('#opcoes-custo .selecionada');
+      if (!dor) { mostrarErro('dor-descricao'); ok = false; }
+      if (!custo) { mostrarErro('custo'); ok = false; }
+    }
+
+    if (bloco === 2) {
+      const registra = document.querySelector('#opcoes-registra .selecionada');
+      const sobrou = document.querySelector('#opcoes-sobrou .selecionada');
+      if (!registra) { mostrarErro('registra'); ok = false; }
+      if (!sobrou) { mostrarErro('sobrou'); ok = false; }
+    }
+
+    if (bloco === 3) {
+      const dec = document.querySelector('#opcoes-decisao .selecionada');
+      const trav = document.getElementById('decisao-travada').value.trim();
+      if (!dec) { mostrarErro('decisao'); ok = false; }
+      if (!trav) { mostrarErro('decisao-travada'); ok = false; }
+    }
+
     return ok;
   }
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearErrors();
+  function mostrarErro(campo) {
+    const el = document.getElementById('erro-' + campo);
+    if (el) el.classList.add('visivel');
+    const input = document.getElementById(campo);
+    if (input) input.classList.add('erro');
+  }
 
-    const fd = new FormData(form);
-    let origem = fd.get('origem') || '';
-    if(origem === 'Outro' && origemOutroInput.value.trim()){
-      origem = `Outro: ${origemOutroInput.value.trim()}`;
-    }
+  window.enviar = async function() {
+    if (!validar(3)) return;
 
-    const data = {
-      nome: fd.get('nome') || '',
-      whatsapp: fd.get('whatsapp') || '',
-      email: fd.get('email') || '',
-      origem: origem,
-      nicho: fd.get('nicho') || '',
-      dificuldade: fd.get('dificuldade') || '',
-      investimento: fd.get('investimento') || ''
+    const btn = document.getElementById('btn-enviar');
+    btn.disabled = true;
+    btn.classList.add('carregando');
+    btn.textContent = 'Enviando...';
+
+    // Coletar dados
+    const dados = {
+      // Identificação
+      nome: document.getElementById('nome').value.trim(),
+      whatsapp: document.getElementById('whatsapp').value.trim(),
+      negocio: document.getElementById('negocio').value.trim(),
+
+      // Dor
+      dor_descricao: document.getElementById('dor-descricao').value.trim(),
+      dor_custo: document.querySelector('#opcoes-custo .selecionada')?.textContent.trim(),
+
+      // Dado
+      dado_registra: document.querySelector('#opcoes-registra .selecionada')?.textContent.trim(),
+      dado_onde: Array.from(document.querySelectorAll('#opcoes-onde .selecionada')).map(o => o.textContent.trim()),
+      dado_sobrou: document.querySelector('#opcoes-sobrou .selecionada')?.textContent.trim(),
+
+      // Decisão
+      decisao_base: document.querySelector('#opcoes-decisao .selecionada')?.textContent.trim(),
+      decisao_travada: document.getElementById('decisao-travada').value.trim(),
+
+      // Meta
+      origem: 'mapa-do-caos',
+      status: 'aguardando_analise',
+      timestamp: serverTimestamp()
     };
 
-    if(!validate(data)){ return; }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Enviando...';
-
     try {
-      await addDoc(collection(db, 'leads'), {
-        ...data,
-        criadoEm: serverTimestamp()
-      });
-      finalSubmitted = true;
-      document.getElementById('formView').classList.add('hidden');
-      document.getElementById('successView').classList.remove('hidden');
-    } catch (err) {
-      console.error(err);
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Enviar e falar com a Ka';
-      alert('Não consegui enviar agora. Verifica sua internet e tenta de novo, por favor.');
+      await addDoc(collection(db, 'leads_mapa_caos'), dados);
+
+      // Atualiza lead parcial se existir
+      if (window._partialId) {
+        await updateDoc(doc(db, 'leads_parciais', window._partialId), {
+          completou: true,
+          timestamp_completo: serverTimestamp()
+        });
+      }
+
+      // Mostra sucesso
+      document.getElementById('bloco-3').classList.remove('ativo');
+      document.getElementById('sucesso').classList.add('visivel');
+      document.getElementById('progresso-fill').style.width = '100%';
+      window._bloco = 4;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } catch(e) {
+      console.error(e);
+      btn.disabled = false;
+      btn.classList.remove('carregando');
+      btn.textContent = 'Enviar meu Mapa →';
+      alert('Ops! Algo deu errado. Verifica sua internet e tenta de novo.');
     }
-  });
+  };
 </script>
 </body>
 </html>

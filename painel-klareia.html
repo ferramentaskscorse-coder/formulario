@@ -126,6 +126,30 @@
     margin-top: 2px;
   }
 
+  .header-acoes {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .header-atualizar {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    transition: all 0.2s;
+  }
+
+  .header-atualizar:hover {
+    color: white;
+    border-color: rgba(255,255,255,0.5);
+  }
+
   .header-sair {
     font-size: 12px;
     color: rgba(255,255,255,0.5);
@@ -409,7 +433,25 @@
   .status-salvar:hover { background: var(--preto); }
   .status-salvar.salvo { background: var(--status-converteu); }
 
-  /* VAZIO */
+  .btn-excluir {
+    padding: 10px 16px;
+    background: transparent;
+    color: var(--status-nao);
+    border: 1.5px solid var(--status-nao);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-excluir:hover {
+    background: var(--status-nao);
+    color: white;
+  }
   .vazio {
     text-align: center;
     padding: 60px 24px;
@@ -456,7 +498,10 @@
       <div class="header-marca">KlareIA</div>
       <div class="header-sub">Painel · Diagnóstico DDD</div>
     </div>
-    <button class="header-sair" onclick="sair()">Sair</button>
+    <div class="header-acoes">
+      <button class="header-atualizar" onclick="carregarLeads()">↻ Atualizar</button>
+      <button class="header-sair" onclick="sair()">Sair</button>
+    </div>
   </div>
 
   <div class="container">
@@ -514,7 +559,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, getDocs, doc, updateDoc, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyA4a47SVBcyC2oC2S0AgzYVVPdPpXVrPMw",
@@ -684,6 +729,7 @@
                 <option value="nao_converteu" ${status === 'nao_converteu' ? 'selected' : ''}>❌ Não converteu</option>
               </select>
               <button class="status-salvar" id="btn-${lead.id}" onclick="salvarStatus('${lead.id}')">Salvar</button>
+              <button class="btn-excluir" onclick="excluirLead('${lead.id}', '${lead.nome}')">Excluir</button>
             </div>
           </div>
         </div>
@@ -729,6 +775,20 @@
     } catch(e) {
       btn.textContent = 'Erro';
       btn.disabled = false;
+    }
+  };
+
+  window.excluirLead = async function(id, nome) {
+    if (!confirm(`Excluir o lead de "${nome}"? Essa ação não pode ser desfeita.`)) return;
+
+    try {
+      await deleteDoc(doc(db, 'leads_mapa_caos', id));
+      todosLeads = todosLeads.filter(l => l.id !== id);
+      atualizarMacro();
+      const filtrados = filtroAtual === 'todos' ? todosLeads : todosLeads.filter(l => (l.status || 'aguardando_analise') === filtroAtual);
+      renderizarLista(filtrados);
+    } catch(e) {
+      alert('Erro ao excluir. Tente novamente.');
     }
   };
 

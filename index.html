@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa do Caos — KlareIA</title>
+<title>Diagnóstico DDD — KlareIA</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
@@ -438,7 +438,7 @@
 <div class="barra-topo"></div>
 
 <div class="hero">
-  <div class="hero-eyebrow">KlareIA · O Mapa</div>
+  <div class="hero-eyebrow">KlareIA · Diagnóstico DDD</div>
   <h1 class="hero-titulo">Vamos entender<br>o seu negócio.</h1>
   <p class="hero-sub">Responda com calma — não tem resposta certa ou errada. Quanto mais honesta você for, mais certeiro vai ser o diagnóstico.</p>
 
@@ -650,7 +650,7 @@
 
     <div class="botoes">
       <button class="btn-voltar" onclick="voltar(3)">← Voltar</button>
-      <button class="btn-avancar" id="btn-enviar" onclick="enviar()">Enviar meu Mapa →</button>
+      <button class="btn-avancar" id="btn-enviar" onclick="enviar()">Enviar meu Diagnóstico →</button>
     </div>
   </div>
 
@@ -675,12 +675,12 @@
   import { getFirestore, collection, addDoc, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyDummy-replace-with-real-key",
+    apiKey: "AIzaSyA4a47SVBcyC2oC2S0AgzYVVPdPpXVrPMw",
     authDomain: "formularioentrada.firebaseapp.com",
     projectId: "formularioentrada",
-    storageBucket: "formularioentrada.appspot.com",
-    messagingSenderId: "000000000000",
-    appId: "1:000000000000:web:000000000000000000"
+    storageBucket: "formularioentrada.firebasestorage.app",
+    messagingSenderId: "719149040677",
+    appId: "1:719149040677:web:47e65c4ba4a93422766bcc"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -868,7 +868,7 @@
       console.error(e);
       btn.disabled = false;
       btn.classList.remove('carregando');
-      btn.textContent = 'Enviar meu Mapa →';
+      btn.textContent = 'Enviar meu Diagnóstico →';
       alert('Ops! Algo deu errado. Verifica sua internet e tenta de novo.');
     }
   };

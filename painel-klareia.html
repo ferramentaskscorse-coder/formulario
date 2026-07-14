@@ -544,13 +544,6 @@
       <button class="filtro-btn" onclick="filtrar('nao_converteu', this)">Não converteu</button>
     </div>
 
-    <!-- FILTRO ORIGEM -->
-    <div class="filtros" style="margin-top: -8px;">
-      <button class="filtro-btn ativo" onclick="filtrarOrigem('todos', this)" id="origem-todos">Todas as origens</button>
-      <button class="filtro-btn" onclick="filtrarOrigem('mapa-do-caos', this)" id="origem-diagnostico">Diagnóstico DDD</button>
-      <button class="filtro-btn" onclick="filtrarOrigem('mini-diagnostico', this)" id="origem-mini">Mini Diagnóstico</button>
-    </div>
-
     <!-- LISTA -->
     <div class="lista-header">
       <span class="lista-titulo">Leads</span>
@@ -591,7 +584,7 @@
     if (senha === SENHA) {
       document.getElementById('login-tela').style.display = 'none';
       document.getElementById('painel').classList.add('visivel');
-      carregarLeads();
+      window.carregarLeads();
     } else {
       document.getElementById('login-erro').style.display = 'block';
       document.getElementById('login-senha').value = '';
@@ -605,7 +598,7 @@
   };
 
   // CARREGAR LEADS — duas coleções
-  async function carregarLeads() {
+  window.carregarLeads = async function() {
     try {
       document.getElementById('lista-leads').innerHTML = '<div class="loading">Carregando leads...</div>';
 
@@ -614,7 +607,7 @@
         getDocs(query(collection(db, 'leads_mini_diagnostico'), orderBy('timestamp', 'desc')))
       ]);
 
-      const leadsDDD = snapDDD.docs.map(d => ({ id: d.id, colecao: 'leads_mapa_caos', origem: d.data().origem || 'mapa-do-caos', ...d.data() }));
+      const leadsDDD = snapDDD.docs.map(d => ({ id: d.id, colecao: 'leads_mapa_caos', origem: 'mapa-do-caos', ...d.data() }));
       const leadsMini = snapMini.docs.map(d => ({ id: d.id, colecao: 'leads_mini_diagnostico', origem: 'mini-diagnostico', ...d.data() }));
 
       todosLeads = [...leadsDDD, ...leadsMini].sort((a, b) => {
@@ -628,16 +621,12 @@
     } catch(e) {
       document.getElementById('lista-leads').innerHTML = '<div class="loading">Erro ao carregar. Verifique as regras do Firestore.</div>';
     }
-  }
+  };
 
   function aplicarFiltros() {
     let resultado = todosLeads;
-    if (filtroAtual !== 'todos') {
-      resultado = resultado.filter(l => (l.status || 'aguardando_analise') === filtroAtual);
-    }
-    if (origemAtual !== 'todos') {
-      resultado = resultado.filter(l => l.origem === origemAtual);
-    }
+    if (filtroAtual !== 'todos') resultado = resultado.filter(l => (l.status || 'aguardando_analise') === filtroAtual);
+    if (origemAtual !== 'todos') resultado = resultado.filter(l => l.origem === origemAtual);
     renderizarLista(resultado);
   }
 
@@ -706,7 +695,6 @@
                 <span>📱 ${lead.whatsapp || '—'}</span>
                 <span>🏪 ${lead.negocio || '—'}</span>
                 <span>📅 ${data}</span>
-                <span style="color: ${lead.origem === 'mini-diagnostico' ? '#7B9E87' : '#BE4D00'}; font-weight: 600;">● ${lead.origem === 'mini-diagnostico' ? 'Mini Diagnóstico' : 'Diagnóstico DDD'}</span>
               </div>
             </div>
             <span class="lead-status-badge badge-${status}">${statusLabel(status)}</span>

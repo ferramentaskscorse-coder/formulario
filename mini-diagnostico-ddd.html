@@ -756,22 +756,19 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  window._db = db;
-</script>
 
-<script>
   let respostas = {};
   let blocoAtual = 0;
 
-  function sel(grupoId, el, campo) {
+  window.sel = function(grupoId, el, campo) {
     document.querySelectorAll('#' + grupoId + ' .opcao').forEach(o => o.classList.remove('selecionada'));
     el.classList.add('selecionada');
     respostas[campo] = el.textContent.trim();
     const erro = document.getElementById('erro-' + campo);
     if (erro) erro.classList.remove('visivel');
-  }
+  };
 
-  function avancar(atual) {
+  window.avancar = function(atual) {
     if (!validar(atual)) return;
     const prox = atual + 1;
     document.getElementById('bloco-' + atual).classList.remove('ativo');
@@ -779,16 +776,16 @@
     blocoAtual = prox;
     atualizarProgresso(prox);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  };
 
-  function voltar(atual) {
+  window.voltar = function(atual) {
     const ant = atual - 1;
     document.getElementById('bloco-' + atual).classList.remove('ativo');
     document.getElementById('bloco-' + ant).classList.add('ativo');
     blocoAtual = ant;
     atualizarProgresso(ant);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  };
 
   function atualizarProgresso(bloco) {
     const pcts = [0, 33, 66, 100];
@@ -803,13 +800,6 @@
 
   function validar(bloco) {
     let ok = true;
-    const campos = {
-      0: ['nome', 'whatsapp'],
-      1: ['d1', 'd2', 'd3'],
-      2: ['g1', 'g2', 'g3'],
-      3: ['e1', 'e2', 'e3']
-    };
-
     if (bloco === 0) {
       const nome = document.getElementById('nome').value.trim();
       const wpp = document.getElementById('whatsapp').value.trim();
@@ -817,37 +807,38 @@
       if (!wpp) { document.getElementById('erro-whatsapp').classList.add('visivel'); ok = false; }
       if (nome) respostas['nome'] = nome;
       if (wpp) respostas['whatsapp'] = wpp;
-    } else {
-      campos[bloco].forEach(campo => {
-        if (!respostas[campo]) {
-          document.getElementById('erro-' + campo).classList.add('visivel');
-          ok = false;
-        }
+    }
+    if (bloco === 1) {
+      ['d1','d2','d3'].forEach(c => {
+        if (!respostas[c]) { document.getElementById('erro-' + c).classList.add('visivel'); ok = false; }
+      });
+    }
+    if (bloco === 2) {
+      ['g1','g2','g3'].forEach(c => {
+        if (!respostas[c]) { document.getElementById('erro-' + c).classList.add('visivel'); ok = false; }
+      });
+    }
+    if (bloco === 3) {
+      ['e1','e2','e3'].forEach(c => {
+        if (!respostas[c]) { document.getElementById('erro-' + c).classList.add('visivel'); ok = false; }
       });
     }
     return ok;
   }
 
-  function verResultado() {
+  window.verResultado = async function() {
     if (!validar(3)) return;
 
     const nome = respostas['nome'] || 'você';
-
-    // Lógica de resultado baseada nas respostas
     const dor = respostas['d1'] || '';
     const custo = respostas['d2'] || '';
-    const tempo = respostas['d3'] || '';
     const registra = respostas['g1'] || '';
     const sobrou = respostas['g2'] || '';
-    const identifica = respostas['g3'] || '';
     const decide = respostas['e1'] || '';
-    const travada = respostas['e2'] || '';
     const impede = respostas['e3'] || '';
 
     // DOR
-    let dorTitulo = 'O problema que está pesando';
     let dorTexto = '';
-
     if (dor.includes('lucro')) {
       dorTexto = 'Você sente que vende, trabalha e se esforça — mas não consegue confirmar se está realmente lucrando. Esse é um dos sinais mais claros de que o negócio está operando sem dado organizado.';
     } else if (dor.includes('mão')) {
@@ -859,9 +850,7 @@
     }
 
     // DADO
-    let dadoTitulo = 'O que o dado já revela';
     let dadoTexto = '';
-
     if (registra.includes('hábito')) {
       dadoTexto = 'Você já registra — e isso é um ponto de partida poderoso. O trabalho aqui não é criar do zero, é organizar o que já existe de um jeito que te ajude a decidir.';
     } else if (registra.includes('Às vezes')) {
@@ -869,73 +858,61 @@
     } else {
       dadoTexto = 'Tudo está na sua cabeça — e isso é mais comum do que parece. O problema é que memória não escala: quando o negócio cresce, o que você guarda mentalmente começa a falhar.';
     }
-
     if (!sobrou.includes('exatamente')) {
       dadoTexto += ' E o fato de você não saber com certeza quanto sobrou no mês passado confirma que ainda falta um processo simples de registro financeiro.';
     }
 
     // DECISÃO
-    let decTitulo = 'Por onde começar agora';
     let decTexto = '';
-
     if (impede.includes('onde começar')) {
-      decTexto = 'O primeiro passo é mais simples do que parece: antes de qualquer sistema ou ferramenta, você precisa entender qual é a sua dor real — não o sintoma, mas o que está por trás dele. É isso que define por onde começar.';
+      decTexto = 'O primeiro passo é mais simples do que parece: antes de qualquer sistema ou ferramenta, você precisa entender qual é a sua dor real — não o sintoma, mas o que está por trás dele.';
     } else if (impede.includes('tempo')) {
-      decTexto = 'O problema não é falta de tempo — é falta de processo. Um método simples que cabe na sua rotina real já muda tudo. Você não precisa de um dia livre pra organizar: precisa de 15 minutos por semana nos lugares certos.';
+      decTexto = 'O problema não é falta de tempo — é falta de processo. Um método simples que cabe na sua rotina real já muda tudo. Você não precisa de um dia livre pra organizar.';
     } else if (impede.includes('medo')) {
       decTexto = 'O medo de olhar pros números é mais comum do que você imagina — e quase sempre o que se encontra não é tão assustador quanto parece. O que paralisa é a incerteza, não a realidade.';
     } else {
-      decTexto = 'Você não precisa de um sistema caro pra ter clareza. Precisa de um método que organize o que já existe, mostre o que está travando e diga o que fazer primeiro — com o que você já tem.';
+      decTexto = 'Você não precisa de um sistema caro pra ter clareza. Precisa de um método que organize o que já existe, mostre o que está travando e diga o que fazer primeiro.';
     }
 
     // INSIGHT
     let insight = '';
     if (decide.includes('eu acho') || decide.includes('Evito')) {
-      insight = `${nome}, o padrão que aparece no seu diagnóstico é claro: você tem um negócio funcionando, mas está operando sem dado organizado pra sustentar as decisões. Isso não é falta de capacidade — é falta de processo. E processo é exatamente o que muda quando você para de decidir no "eu acho que" e começa a decidir com o número certo na mão.`;
+      insight = `${nome}, o padrão que aparece no seu diagnóstico é claro: você tem um negócio funcionando, mas está operando sem dado organizado pra sustentar as decisões. Isso não é falta de capacidade — é falta de processo.`;
     } else if (decide.includes('intuição')) {
-      insight = `${nome}, sua intuição sobre o negócio é um ativo real — mas ela fica muito mais poderosa quando combinada com dado. O que aparece no seu diagnóstico é que você já tem conhecimento do negócio; o que falta é um registro consistente que transforme esse conhecimento em decisão segura.`;
+      insight = `${nome}, sua intuição sobre o negócio é um ativo real — mas ela fica muito mais poderosa quando combinada com dado. O que falta é um registro consistente que transforme esse conhecimento em decisão segura.`;
     } else {
-      insight = `${nome}, você já tem uma base — o que aparece no seu diagnóstico é que o próximo passo é organizar o que já existe de um jeito que te dê clareza rápida na hora de decidir. Você não está longe: está a um processo de distância.`;
+      insight = `${nome}, você já tem uma base — o que aparece no seu diagnóstico é que o próximo passo é organizar o que já existe de um jeito que te dê clareza rápida na hora de decidir.`;
     }
 
-    // Montar resultado na tela
+    // Preencher resultado na tela
     document.getElementById('res-titulo').textContent = nome + ', seu diagnóstico está pronto.';
     document.getElementById('res-nome-sub').textContent = 'Veja o que encontrei sobre o seu negócio agora.';
-    document.getElementById('res-dor-titulo').textContent = dorTitulo;
     document.getElementById('res-dor-texto').textContent = dorTexto;
-    document.getElementById('res-dado-titulo').textContent = dadoTitulo;
     document.getElementById('res-dado-texto').textContent = dadoTexto;
-    document.getElementById('res-dec-titulo').textContent = decTitulo;
     document.getElementById('res-dec-texto').textContent = decTexto;
     document.getElementById('res-insight').textContent = insight;
 
-    // Esconder formulário e mostrar resultado
+    // Mostrar resultado
     document.getElementById('hero-topo').style.display = 'none';
     document.getElementById('form-container').style.display = 'none';
-    document.getElementById('progresso-fill').style.width = '100%';
     document.getElementById('resultado').classList.add('visivel');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Salvar no Firebase
     try {
-      const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-      await addDoc(collection(window._db, 'leads_mini_diagnostico'), {
+      await addDoc(collection(db, 'leads_mini_diagnostico'), {
         nome: respostas['nome'],
         whatsapp: respostas['whatsapp'],
         origem: 'mini-diagnostico',
-        // Dor
         dor_principal: respostas['d1'],
         dor_custo: respostas['d2'],
         dor_tempo: respostas['d3'],
-        // Dado
         dado_registra: respostas['g1'],
         dado_sobrou: respostas['g2'],
         dado_identifica: respostas['g3'],
-        // Decisão
         decisao_base: respostas['e1'],
         decisao_travada: respostas['e2'],
         decisao_impede: respostas['e3'],
-        // Resultado gerado
         resultado_dor: dorTexto,
         resultado_dado: dadoTexto,
         resultado_decisao: decTexto,
@@ -944,9 +921,10 @@
         timestamp: serverTimestamp()
       });
     } catch(e) {
-      console.log('Firebase:', e);
+      console.log('Firebase erro:', e);
     }
-  }
+  };
 </script>
+
 </body>
 </html>

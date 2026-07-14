@@ -109,6 +109,8 @@
   .cta-resultado-titulo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; margin-bottom: 8px; line-height: 1.3; }
   .cta-resultado-sub { font-size: 14px; color: rgba(255,255,255,0.85); line-height: 1.6; margin-bottom: 12px; }
   .cta-resultado-preco { font-size: 13px; color: rgba(255,255,255,0.8); margin-bottom: 16px; letter-spacing: 0.06em; }
+  .preco-riscado { text-decoration: line-through; opacity: 0.6; margin-right: 6px; }
+  .preco-atual { font-weight: 700; font-size: 15px; }
   .cta-resultado-btn { display: inline-block; padding: 16px 32px; background: white; color: var(--laranja); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; width: 100%; transition: all 0.2s; }
   .cta-resultado-btn:hover { background: var(--preto); color: white; }
 
@@ -201,6 +203,17 @@
         <div class="opcao" onclick="sel('opc-d3','d3',this)"><div class="opcao-dot"></div>Desde que abri o negócio</div>
       </div>
       <span class="msg-erro" id="erro-d3">Selecione uma opção.</span>
+    </div>
+    <div class="pergunta">
+      <label class="pergunta-label">4. O que você já tentou pra resolver isso?</label>
+      <div class="opcoes" id="opc-d4">
+        <div class="opcao" onclick="sel('opc-d4','d4',this)"><div class="opcao-dot"></div>Planilha ou controle manual</div>
+        <div class="opcao" onclick="sel('opc-d4','d4',this)"><div class="opcao-dot"></div>Aplicativo ou sistema de gestão</div>
+        <div class="opcao" onclick="sel('opc-d4','d4',this)"><div class="opcao-dot"></div>Curso ou conteúdo online</div>
+        <div class="opcao" onclick="sel('opc-d4','d4',this)"><div class="opcao-dot"></div>Contratar alguém pra ajudar</div>
+        <div class="opcao" onclick="sel('opc-d4','d4',this)"><div class="opcao-dot"></div>Ainda não tentei nada</div>
+      </div>
+      <span class="msg-erro" id="erro-d4">Selecione uma opção.</span>
     </div>
     <div class="botoes">
       <button class="btn-voltar" onclick="voltar(1)">← Voltar</button>
@@ -325,8 +338,8 @@
     <div class="cta-resultado">
       <h3 class="cta-resultado-titulo">Quer ir mais fundo?</h3>
       <p class="cta-resultado-sub">No Diagnóstico DDD eu analiso o seu negócio pessoalmente e entrego um caminho completo do que fazer primeiro — em áudio, PDF e videochamada comigo.</p>
-      <div class="cta-resultado-preco">De R$997 por R$497 · Entrega em até 48h úteis</div>
-      <a href="https://ferramentaskscorse-coder.github.io/formulario/" target="_blank" class="cta-resultado-btn">Quero meu Diagnóstico completo →</a>
+      <div class="cta-resultado-preco"><span class="preco-riscado">R$997</span> <span class="preco-atual">R$497</span> · Entrega em até 48h úteis</div>
+      <a href="https://pay.kiwify.com.br/pGDld17" target="_blank" class="cta-resultado-btn">Quero meu Diagnóstico completo →</a>
     </div>
     <div class="divisor"></div>
     <div class="rodape">KlareIA · Karen Scorse · Gestão com IA e Dados</div>
@@ -384,7 +397,7 @@
       if (nome) respostas['nome'] = nome;
       if (wpp) respostas['whatsapp'] = wpp;
     }
-    var mapa = { 1: ['d1','d2','d3'], 2: ['g1','g2','g3'], 3: ['e1','e2','e3'] };
+    var mapa = { 1: ['d1','d2','d3','d4'], 2: ['g1','g2','g3'], 3: ['e1','e2','e3'] };
     if (mapa[bloco]) {
       mapa[bloco].forEach(function(c) {
         if (!respostas[c]) { document.getElementById('erro-' + c).classList.add('visivel'); ok = false; }
@@ -485,6 +498,7 @@
           dor_principal: respostas['d1'],
           dor_custo: respostas['d2'],
           dor_tempo: respostas['d3'],
+          dor_tentou: respostas['d4'],
           dado_registra: respostas['g1'],
           dado_sobrou: respostas['g2'],
           dado_identifica: respostas['g3'],

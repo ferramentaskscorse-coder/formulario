@@ -544,6 +544,13 @@
       <button class="filtro-btn" onclick="filtrar('nao_converteu', this)">Não converteu</button>
     </div>
 
+    <!-- FILTRO ORIGEM -->
+    <div class="filtros" style="margin-top: -8px;">
+      <button class="filtro-btn ativo" onclick="filtrarOrigem('todos', this)" id="origem-todos">Todas as origens</button>
+      <button class="filtro-btn" onclick="filtrarOrigem('mapa-do-caos', this)" id="origem-diagnostico">Diagnóstico DDD</button>
+      <button class="filtro-btn" onclick="filtrarOrigem('mini-diagnostico', this)" id="origem-mini">Mini Diagnóstico</button>
+    </div>
+
     <!-- LISTA -->
     <div class="lista-header">
       <span class="lista-titulo">Leads</span>
@@ -576,6 +583,7 @@
   const SENHA = "050431";
   let todosLeads = [];
   let filtroAtual = 'todos';
+  let origemAtual = 'todos';
 
   // LOGIN
   window.entrar = function() {
@@ -596,18 +604,49 @@
     document.getElementById('login-senha').value = '';
   };
 
-  // CARREGAR LEADS
+  // CARREGAR LEADS — duas coleções
   async function carregarLeads() {
     try {
-      const q = query(collection(db, 'leads_mapa_caos'), orderBy('timestamp', 'desc'));
-      const snap = await getDocs(q);
-      todosLeads = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      document.getElementById('lista-leads').innerHTML = '<div class="loading">Carregando leads...</div>';
+
+      const [snapDDD, snapMini] = await Promise.all([
+        getDocs(query(collection(db, 'leads_mapa_caos'), orderBy('timestamp', 'desc'))),
+        getDocs(query(collection(db, 'leads_mini_diagnostico'), orderBy('timestamp', 'desc')))
+      ]);
+
+      const leadsDDD = snapDDD.docs.map(d => ({ id: d.id, colecao: 'leads_mapa_caos', origem: d.data().origem || 'mapa-do-caos', ...d.data() }));
+      const leadsMini = snapMini.docs.map(d => ({ id: d.id, colecao: 'leads_mini_diagnostico', origem: 'mini-diagnostico', ...d.data() }));
+
+      todosLeads = [...leadsDDD, ...leadsMini].sort((a, b) => {
+        const ta = a.timestamp?.toDate?.() || new Date(0);
+        const tb = b.timestamp?.toDate?.() || new Date(0);
+        return tb - ta;
+      });
+
       atualizarMacro();
-      renderizarLista(todosLeads);
+      aplicarFiltros();
     } catch(e) {
       document.getElementById('lista-leads').innerHTML = '<div class="loading">Erro ao carregar. Verifique as regras do Firestore.</div>';
     }
   }
+
+  function aplicarFiltros() {
+    let resultado = todosLeads;
+    if (filtroAtual !== 'todos') {
+      resultado = resultado.filter(l => (l.status || 'aguardando_analise') === filtroAtual);
+    }
+    if (origemAtual !== 'todos') {
+      resultado = resultado.filter(l => l.origem === origemAtual);
+    }
+    renderizarLista(resultado);
+  }
+
+  window.filtrarOrigem = function(origem, btn) {
+    origemAtual = origem;
+    document.querySelectorAll('[id^="origem-"]').forEach(b => b.classList.remove('ativo'));
+    btn.classList.add('ativo');
+    aplicarFiltros();
+  };
 
   // MACRO
   function atualizarMacro() {
@@ -636,10 +675,9 @@
   // FILTRAR
   window.filtrar = function(status, btn) {
     filtroAtual = status;
-    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
+    document.querySelectorAll('.filtro-btn:not([id^="origem-"])').forEach(b => b.classList.remove('ativo'));
     btn.classList.add('ativo');
-    const filtrados = status === 'todos' ? todosLeads : todosLeads.filter(l => (l.status || 'aguardando_analise') === status);
-    renderizarLista(filtrados);
+    aplicarFiltros();
   };
 
   // RENDERIZAR
@@ -668,6 +706,7 @@
                 <span>📱 ${lead.whatsapp || '—'}</span>
                 <span>🏪 ${lead.negocio || '—'}</span>
                 <span>📅 ${data}</span>
+                <span style="color: ${lead.origem === 'mini-diagnostico' ? '#7B9E87' : '#BE4D00'}; font-weight: 600;">● ${lead.origem === 'mini-diagnostico' ? 'Mini Diagnóstico' : 'Diagnóstico DDD'}</span>
               </div>
             </div>
             <span class="lead-status-badge badge-${status}">${statusLabel(status)}</span>
@@ -742,6 +781,8 @@
   };
 
   window.salvarStatus = async function(id) {
+    const lead = todosLeads.find(l => l.id === id);
+    const colecao = lead?.colecao || 'leads_mapa_caos';
     const select = document.getElementById('select-' + id);
     const btn = document.getElementById('btn-' + id);
     const novoStatus = select.value;
@@ -750,13 +791,9 @@
     btn.disabled = true;
 
     try {
-      await updateDoc(doc(db, 'leads_mapa_caos', id), { status: novoStatus });
-
-      // Atualiza local
-      const lead = todosLeads.find(l => l.id === id);
+      await updateDoc(doc(db, colecao, id), { status: novoStatus });
       if (lead) lead.status = novoStatus;
 
-      // Atualiza badge
       const card = document.getElementById('card-' + id);
       const badge = card.querySelector('.lead-status-badge');
       badge.className = 'lead-status-badge badge-' + novoStatus;
@@ -771,7 +808,6 @@
       }, 2000);
 
       atualizarMacro();
-
     } catch(e) {
       btn.textContent = 'Erro';
       btn.disabled = false;
@@ -780,13 +816,14 @@
 
   window.excluirLead = async function(id, nome) {
     if (!confirm(`Excluir o lead de "${nome}"? Essa ação não pode ser desfeita.`)) return;
+    const lead = todosLeads.find(l => l.id === id);
+    const colecao = lead?.colecao || 'leads_mapa_caos';
 
     try {
-      await deleteDoc(doc(db, 'leads_mapa_caos', id));
+      await deleteDoc(doc(db, colecao, id));
       todosLeads = todosLeads.filter(l => l.id !== id);
       atualizarMacro();
-      const filtrados = filtroAtual === 'todos' ? todosLeads : todosLeads.filter(l => (l.status || 'aguardando_analise') === filtroAtual);
-      renderizarLista(filtrados);
+      aplicarFiltros();
     } catch(e) {
       alert('Erro ao excluir. Tente novamente.');
     }

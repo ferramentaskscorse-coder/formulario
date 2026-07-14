@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Diagnóstico DDD — KlareIA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --marrom: #4f2c1d;
+    --laranja: #BE4D00;
+    --dourado: #C9A84C;
+    --dourado-claro: #F0DFA0;
+    --branco: #F9F7F4;
+    --cinza-suave: #E8E5DF;
+    --cinza-medio: #9A9590;
+    --cinza-escuro: #3A3835;
+    --preto: #0F0F0F;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--branco);
+    font-family: 'Inter', sans-serif;
+    color: var(--preto);
+    min-height: 100vh;
+  }
+
+  /* BARRA TOPO */
+  .barra-topo {
+    height: 4px;
+    background: linear-gradient(90deg, var(--marrom), var(--laranja), var(--dourado));
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--marrom);
+    padding: 48px 24px 40px;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--laranja);
+    margin-bottom: 16px;
+  }
+
+  .hero-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 5vw, 38px);
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .hero-titulo span {
+    color: var(--dourado);
+    font-style: italic;
+  }
+
+  .hero-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+    max-width: 420px;
+    margin: 0 auto 32px;
+  }
+
+  /* PROGRESSO */
+  .progresso-wrap {
+    max-width: 360px;
+    margin: 0 auto;
+  }
+
+  .progresso-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .step-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    transition: color 0.3s;
+  }
+
+  .step-label.ativo { color: var(--dourado); }
+  .step-label.feito { color: rgba(255,255,255,0.6); }
+
+  .progresso-barra {
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 1px;
+  }
+
+  .progresso-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--laranja), var(--dourado));
+    border-radius: 1px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* CONTAINER */
+  .container {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* BLOCOS */
+  .bloco { display: none; animation: fadeUp 0.35s ease; }
+  .bloco.ativo { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bloco-header { margin-bottom: 36px; }
+
+  .bloco-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .bloco-tag::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 1px;
+  }
+
+  .tag-dor { color: var(--laranja); }
+  .tag-dado { color: var(--dourado); }
+  .tag-decisao { color: #7B9E87; }
+  .tag-inicio { color: var(--laranja); }
+
+  .bloco-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--preto);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .bloco-desc {
+    font-size: 14px;
+    color: var(--cinza-medio);
+    line-height: 1.6;
+  }
+
+  /* PERGUNTAS */
+  .pergunta { margin-bottom: 28px; }
+
+  .pergunta-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--cinza-escuro);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  /* OPCOES */
+  .opcoes { display: flex; flex-direction: column; gap: 8px; }
+
+  .opcao {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    background: white;
+    border: 1.5px solid var(--cinza-suave);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    color: var(--cinza-escuro);
+    user-select: none;
+  }
+
+  .opcao:hover { border-color: var(--laranja); color: var(--preto); }
+
+  .opcao.selecionada {
+    border-color: var(--laranja);
+    background: #FDF2EC;
+    color: var(--preto);
+    font-weight: 500;
+  }
+
+  .opcao-dot {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--cinza-suave);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .opcao.selecionada .opcao-dot {
+    border-color: var(--laranja);
+    background: var(--laranja);
+  }
+
+  .opcao.selecionada .opcao-dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px;
+    height: 5px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  /* TEXTAREA */
+  textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: white;
+    border: 1.5px solid var(--cinza-suave);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--preto);
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  textarea:focus { border-color: var(--laranja); }
+
+  /* INPUT */
+  input[type="text"], input[type="tel"] {
+    width: 100%;
+    padding: 14px 16px;
+    background: white;
+    border: 1.5px solid var(--cinza-suave);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--preto);
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+
+  input[type="text"]:focus, input[type="tel"]:focus { border-color: var(--laranja); }
+
+  /* ERRO */
+  .msg-erro {
+    font-size: 12px;
+    color: #C0392B;
+    margin-top: 6px;
+    display: none;
+  }
+  .msg-erro.visivel { display: block; }
+
+  /* BOTOES */
+  .botoes {
+    display: flex;
+    gap: 12px;
+    margin-top: 36px;
+  }
+
+  .btn-voltar {
+    padding: 14px 20px;
+    background: transparent;
+    border: 1.5px solid var(--cinza-suave);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--cinza-medio);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-voltar:hover { border-color: var(--cinza-escuro); color: var(--cinza-escuro); }
+
+  .btn-avancar {
+    flex: 1;
+    padding: 16px 24px;
+    background: var(--marrom);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-avancar:hover { background: var(--preto); }
+  .btn-avancar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* RESULTADO */
+  .resultado { display: none; animation: fadeUp 0.4s ease; }
+  .resultado.visivel { display: block; }
+
+  .resultado-hero {
+    background: var(--marrom);
+    padding: 40px 24px;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .resultado-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--laranja);
+    margin-bottom: 12px;
+  }
+
+  .resultado-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 4vw, 30px);
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .resultado-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+  }
+
+  .resultado-container {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* CARDS DDD */
+  .ddd-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .ddd-card {
+    background: white;
+    border: 1px solid var(--cinza-suave);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ddd-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+  }
+
+  .ddd-card.dor::before { background: var(--laranja); }
+  .ddd-card.dado::before { background: var(--dourado); }
+  .ddd-card.decisao::before { background: #7B9E87; }
+
+  .ddd-card-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .ddd-card.dor .ddd-card-tag { color: var(--laranja); }
+  .ddd-card.dado .ddd-card-tag { color: var(--dourado); }
+  .ddd-card.decisao .ddd-card-tag { color: #7B9E87; }
+
+  .ddd-card-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--preto);
+    margin-bottom: 8px;
+  }
+
+  .ddd-card-texto {
+    font-size: 14px;
+    color: var(--cinza-escuro);
+    line-height: 1.6;
+  }
+
+  /* INSIGHT */
+  .insight-box {
+    background: var(--preto);
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+
+  .insight-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dourado);
+    margin-bottom: 10px;
+  }
+
+  .insight-texto {
+    font-size: 15px;
+    color: white;
+    line-height: 1.7;
+  }
+
+  /* CTA RESULTADO */
+  .cta-resultado {
+    background: var(--laranja);
+    padding: 32px 28px;
+    text-align: center;
+  }
+
+  .cta-resultado-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .cta-resultado-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .cta-resultado-preco {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 16px;
+    letter-spacing: 0.06em;
+  }
+
+  .cta-resultado-btn {
+    display: inline-block;
+    padding: 16px 32px;
+    background: white;
+    color: var(--laranja);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+  }
+
+  .cta-resultado-btn:hover { background: var(--preto); color: white; }
+
+  .divisor {
+    height: 1px;
+    background: var(--cinza-suave);
+    margin: 32px 0;
+  }
+
+  .rodape {
+    text-align: center;
+    font-size: 12px;
+    color: var(--cinza-medio);
+    padding-bottom: 40px;
+  }
+
+  @media (max-width: 480px) {
+    .hero { padding: 36px 20px 32px; }
+    .container { padding: 36px 20px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="barra-topo"></div>
+
+<!-- HERO -->
+<div class="hero" id="hero-topo">
+  <div class="hero-eyebrow">KlareIA · Mini Diagnóstico</div>
+  <h1 class="hero-titulo">Descubra o que está <span>travando</span> seu negócio</h1>
+  <p class="hero-sub">Em 10 minutos você descobre qual é o maior problema do seu negócio hoje — e o que fazer primeiro pra resolver.</p>
+
+  <div class="progresso-wrap">
+    <div class="progresso-steps">
+      <span class="step-label ativo" id="step-dor">Dor</span>
+      <span class="step-label" id="step-dado">Dado</span>
+      <span class="step-label" id="step-decisao">Decisão</span>
+    </div>
+    <div class="progresso-barra">
+      <div class="progresso-fill" id="progresso-fill"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FORMULÁRIO -->
+<div class="container" id="form-container">
+
+  <!-- BLOCO 0: IDENTIFICAÇÃO -->
+  <div class="bloco ativo" id="bloco-0">
+    <div class="bloco-header">
+      <div class="bloco-tag tag-inicio">Antes de começar</div>
+      <h2 class="bloco-titulo">Como posso te chamar?</h2>
+      <p class="bloco-desc">Só preciso do seu nome e WhatsApp pra personalizar seu diagnóstico.</p>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label" for="nome">Seu nome</label>
+      <input type="text" id="nome" placeholder="Como você gostaria de ser chamada" />
+      <span class="msg-erro" id="erro-nome">Por favor, informe seu nome.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label" for="whatsapp">Seu WhatsApp</label>
+      <input type="tel" id="whatsapp" placeholder="(11) 99999-9999" />
+      <span class="msg-erro" id="erro-whatsapp">Por favor, informe seu WhatsApp.</span>
+    </div>
+
+    <div class="botoes">
+      <button class="btn-avancar" onclick="avancar(0)">Começar →</button>
+    </div>
+  </div>
+
+  <!-- BLOCO 1: DOR -->
+  <div class="bloco" id="bloco-1">
+    <div class="bloco-header">
+      <div class="bloco-tag tag-dor">D · Dor</div>
+      <h2 class="bloco-titulo">O que está pesando no seu negócio?</h2>
+      <p class="bloco-desc">Responda com honestidade — não tem resposta certa ou errada.</p>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">1. Qual é a maior dificuldade que você enfrenta na gestão do seu negócio hoje?</label>
+      <div class="opcoes" id="opc-dor1">
+        <div class="opcao" onclick="sel('opc-dor1', this, 'd1')"><div class="opcao-dot"></div>Não sei se estou tendo lucro de verdade</div>
+        <div class="opcao" onclick="sel('opc-dor1', this, 'd1')"><div class="opcao-dot"></div>Faço tudo na mão e nunca sobra tempo</div>
+        <div class="opcao" onclick="sel('opc-dor1', this, 'd1')"><div class="opcao-dot"></div>Não consigo tomar decisões com segurança</div>
+        <div class="opcao" onclick="sel('opc-dor1', this, 'd1')"><div class="opcao-dot"></div>Não entendo pra onde o dinheiro vai</div>
+      </div>
+      <span class="msg-erro" id="erro-d1">Selecione uma opção.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">2. Isso está te custando mais em:</label>
+      <div class="opcoes" id="opc-dor2">
+        <div class="opcao" onclick="sel('opc-dor2', this, 'd2')"><div class="opcao-dot"></div>Tempo — faço tudo na mão e me esgoto</div>
+        <div class="opcao" onclick="sel('opc-dor2', this, 'd2')"><div class="opcao-dot"></div>Dinheiro — não sei se estou no lucro ou no prejuízo</div>
+        <div class="opcao" onclick="sel('opc-dor2', this, 'd2')"><div class="opcao-dot"></div>Energia — me sinto sobrecarregada e sem clareza</div>
+        <div class="opcao" onclick="sel('opc-dor2', this, 'd2')"><div class="opcao-dot"></div>Os três ao mesmo tempo</div>
+      </div>
+      <span class="msg-erro" id="erro-d2">Selecione uma opção.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">3. Há quanto tempo você convive com esse problema?</label>
+      <div class="opcoes" id="opc-dor3">
+        <div class="opcao" onclick="sel('opc-dor3', this, 'd3')"><div class="opcao-dot"></div>Menos de 6 meses</div>
+        <div class="opcao" onclick="sel('opc-dor3', this, 'd3')"><div class="opcao-dot"></div>Entre 6 meses e 1 ano</div>
+        <div class="opcao" onclick="sel('opc-dor3', this, 'd3')"><div class="opcao-dot"></div>Mais de 1 ano</div>
+        <div class="opcao" onclick="sel('opc-dor3', this, 'd3')"><div class="opcao-dot"></div>Desde que abri o negócio</div>
+      </div>
+      <span class="msg-erro" id="erro-d3">Selecione uma opção.</span>
+    </div>
+
+    <div class="botoes">
+      <button class="btn-voltar" onclick="voltar(1)">← Voltar</button>
+      <button class="btn-avancar" onclick="avancar(1)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: DADO -->
+  <div class="bloco" id="bloco-2">
+    <div class="bloco-header">
+      <div class="bloco-tag tag-dado">D · Dado</div>
+      <h2 class="bloco-titulo">O que você já tem de informação?</h2>
+      <p class="bloco-desc">Quase todo negócio já tem dado — só que desorganizado. Vamos encontrar o seu.</p>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">4. Você registra as informações do seu negócio em algum lugar hoje?</label>
+      <div class="opcoes" id="opc-dado1">
+        <div class="opcao" onclick="sel('opc-dado1', this, 'g1')"><div class="opcao-dot"></div>Sim, tenho o hábito de anotar</div>
+        <div class="opcao" onclick="sel('opc-dado1', this, 'g1')"><div class="opcao-dot"></div>Às vezes, mas não é consistente</div>
+        <div class="opcao" onclick="sel('opc-dado1', this, 'g1')"><div class="opcao-dot"></div>Não, guardo tudo na cabeça</div>
+      </div>
+      <span class="msg-erro" id="erro-g1">Selecione uma opção.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">5. Você consegue responder agora quanto sobrou no seu negócio no mês passado?</label>
+      <div class="opcoes" id="opc-dado2">
+        <div class="opcao" onclick="sel('opc-dado2', this, 'g2')"><div class="opcao-dot"></div>Sim, sei exatamente o valor</div>
+        <div class="opcao" onclick="sel('opc-dado2', this, 'g2')"><div class="opcao-dot"></div>Tenho uma ideia, mas não tenho certeza</div>
+        <div class="opcao" onclick="sel('opc-dado2', this, 'g2')"><div class="opcao-dot"></div>Não sei — não tenho esse controle</div>
+      </div>
+      <span class="msg-erro" id="erro-g2">Selecione uma opção.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">6. Quando algo dá errado no negócio, você consegue identificar onde foi o problema?</label>
+      <div class="opcoes" id="opc-dado3">
+        <div class="opcao" onclick="sel('opc-dado3', this, 'g3')"><div class="opcao-dot"></div>Sim, consigo identificar com clareza</div>
+        <div class="opcao" onclick="sel('opc-dado3', this, 'g3')"><div class="opcao-dot"></div>Às vezes, mas demora pra entender</div>
+        <div class="opcao" onclick="sel('opc-dado3', this, 'g3')"><div class="opcao-dot"></div>Raramente — fico sem saber o que aconteceu</div>
+      </div>
+      <span class="msg-erro" id="erro-g3">Selecione uma opção.</span>
+    </div>
+
+    <div class="botoes">
+      <button class="btn-voltar" onclick="voltar(2)">← Voltar</button>
+      <button class="btn-avancar" onclick="avancar(2)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DECISÃO -->
+  <div class="bloco" id="bloco-3">
+    <div class="bloco-header">
+      <div class="bloco-tag tag-decisao">D · Decisão</div>
+      <h2 class="bloco-titulo">Como você decide?</h2>
+      <p class="bloco-desc">Essa é a parte mais importante. Responde com honestidade.</p>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">7. Quando você precisa tomar uma decisão importante no negócio, você se baseia em quê?</label>
+      <div class="opcoes" id="opc-dec1">
+        <div class="opcao" onclick="sel('opc-dec1', this, 'e1')"><div class="opcao-dot"></div>Em números e registros — tenho dados pra decidir</div>
+        <div class="opcao" onclick="sel('opc-dec1', this, 'e1')"><div class="opcao-dot"></div>Na experiência e intuição — conheço meu negócio</div>
+        <div class="opcao" onclick="sel('opc-dec1', this, 'e1')"><div class="opcao-dot"></div>No "eu acho que" — sem muita certeza</div>
+        <div class="opcao" onclick="sel('opc-dec1', this, 'e1')"><div class="opcao-dot"></div>Evito decidir — fico travada</div>
+      </div>
+      <span class="msg-erro" id="erro-e1">Selecione uma opção.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">8. Existe alguma decisão que você está travada pra tomar hoje?</label>
+      <div class="opcoes" id="opc-dec2">
+        <div class="opcao" onclick="sel('opc-dec2', this, 'e2')"><div class="opcao-dot"></div>Sim, tem uma decisão grande me pesando</div>
+        <div class="opcao" onclick="sel('opc-dec2', this, 'e2')"><div class="opcao-dot"></div>Sim, são várias ao mesmo tempo</div>
+        <div class="opcao" onclick="sel('opc-dec2', this, 'e2')"><div class="opcao-dot"></div>Não, mas me sinto insegura nas decisões do dia a dia</div>
+        <div class="opcao" onclick="sel('opc-dec2', this, 'e2')"><div class="opcao-dot"></div>Não, consigo decidir bem hoje</div>
+      </div>
+      <span class="msg-erro" id="erro-e2">Selecione uma opção.</span>
+    </div>
+
+    <div class="pergunta">
+      <label class="pergunta-label">9. O que te impede de resolver isso agora?</label>
+      <div class="opcoes" id="opc-dec3">
+        <div class="opcao" onclick="sel('opc-dec3', this, 'e3')"><div class="opcao-dot"></div>Falta de tempo pra parar e organizar</div>
+        <div class="opcao" onclick="sel('opc-dec3', this, 'e3')"><div class="opcao-dot"></div>Não sei por onde começar</div>
+        <div class="opcao" onclick="sel('opc-dec3', this, 'e3')"><div class="opcao-dot"></div>Medo de olhar pro que vou encontrar</div>
+        <div class="opcao" onclick="sel('opc-dec3', this, 'e3')"><div class="opcao-dot"></div>Achei que precisava de um sistema caro pra isso</div>
+      </div>
+      <span class="msg-erro" id="erro-e3">Selecione uma opção.</span>
+    </div>
+
+    <div class="botoes">
+      <button class="btn-voltar" onclick="voltar(3)">← Voltar</button>
+      <button class="btn-avancar" onclick="verResultado()">Ver meu diagnóstico →</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- RESULTADO -->
+<div class="resultado" id="resultado">
+
+  <div class="resultado-hero">
+    <div class="resultado-eyebrow">Seu Mini Diagnóstico DDD</div>
+    <h2 class="resultado-titulo" id="res-titulo">Seu diagnóstico está pronto</h2>
+    <p class="resultado-sub" id="res-nome-sub"></p>
+  </div>
+
+  <div class="resultado-container">
+
+    <div class="ddd-cards">
+      <div class="ddd-card dor">
+        <div class="ddd-card-tag">D · Dor</div>
+        <div class="ddd-card-titulo" id="res-dor-titulo">A dor real</div>
+        <div class="ddd-card-texto" id="res-dor-texto"></div>
+      </div>
+
+      <div class="ddd-card dado">
+        <div class="ddd-card-tag">D · Dado</div>
+        <div class="ddd-card-titulo" id="res-dado-titulo">O que o dado revela</div>
+        <div class="ddd-card-texto" id="res-dado-texto"></div>
+      </div>
+
+      <div class="ddd-card decisao">
+        <div class="ddd-card-tag">D · Decisão</div>
+        <div class="ddd-card-titulo" id="res-dec-titulo">Por onde começar</div>
+        <div class="ddd-card-texto" id="res-dec-texto"></div>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <div class="insight-tag">Insight do diagnóstico</div>
+      <div class="insight-texto" id="res-insight"></div>
+    </div>
+
+    <div class="cta-resultado">
+      <h3 class="cta-resultado-titulo">Quer ir mais fundo?</h3>
+      <p class="cta-resultado-sub">No Diagnóstico DDD eu analiso o seu negócio pessoalmente e entrego um caminho completo do que fazer primeiro — em áudio, PDF e videochamada comigo.</p>
+      <div class="cta-resultado-preco">R$147 · Entrega em até 48h</div>
+      <a href="https://ferramentaskscorse-coder.github.io/formulario/" class="cta-resultado-btn">Quero meu Diagnóstico DDD completo →</a>
+    </div>
+
+    <div class="divisor"></div>
+    <div class="rodape">KlareIA · Karen Scorse · Gestão com IA e Dados</div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA4a47SVBcyC2oC2S0AgzYVVPdPpXVrPMw",
+    authDomain: "formularioentrada.firebaseapp.com",
+    projectId: "formularioentrada",
+    storageBucket: "formularioentrada.firebasestorage.app",
+    messagingSenderId: "719149040677",
+    appId: "1:719149040677:web:47e65c4ba4a93422766bcc"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window._db = db;
+</script>
+
+<script>
+  let respostas = {};
+  let blocoAtual = 0;
+
+  function sel(grupoId, el, campo) {
+    document.querySelectorAll('#' + grupoId + ' .opcao').forEach(o => o.classList.remove('selecionada'));
+    el.classList.add('selecionada');
+    respostas[campo] = el.textContent.trim();
+    const erro = document.getElementById('erro-' + campo);
+    if (erro) erro.classList.remove('visivel');
+  }
+
+  function avancar(atual) {
+    if (!validar(atual)) return;
+    const prox = atual + 1;
+    document.getElementById('bloco-' + atual).classList.remove('ativo');
+    document.getElementById('bloco-' + prox).classList.add('ativo');
+    blocoAtual = prox;
+    atualizarProgresso(prox);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function voltar(atual) {
+    const ant = atual - 1;
+    document.getElementById('bloco-' + atual).classList.remove('ativo');
+    document.getElementById('bloco-' + ant).classList.add('ativo');
+    blocoAtual = ant;
+    atualizarProgresso(ant);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function atualizarProgresso(bloco) {
+    const pcts = [0, 33, 66, 100];
+    document.getElementById('progresso-fill').style.width = (pcts[bloco] || 0) + '%';
+    ['dor','dado','decisao'].forEach((s, i) => {
+      const el = document.getElementById('step-' + s);
+      el.classList.remove('ativo', 'feito');
+      if (bloco === i + 1) el.classList.add('ativo');
+      if (bloco > i + 1) el.classList.add('feito');
+    });
+  }
+
+  function validar(bloco) {
+    let ok = true;
+    const campos = {
+      0: ['nome', 'whatsapp'],
+      1: ['d1', 'd2', 'd3'],
+      2: ['g1', 'g2', 'g3'],
+      3: ['e1', 'e2', 'e3']
+    };
+
+    if (bloco === 0) {
+      const nome = document.getElementById('nome').value.trim();
+      const wpp = document.getElementById('whatsapp').value.trim();
+      if (!nome) { document.getElementById('erro-nome').classList.add('visivel'); ok = false; }
+      if (!wpp) { document.getElementById('erro-whatsapp').classList.add('visivel'); ok = false; }
+      if (nome) respostas['nome'] = nome;
+      if (wpp) respostas['whatsapp'] = wpp;
+    } else {
+      campos[bloco].forEach(campo => {
+        if (!respostas[campo]) {
+          document.getElementById('erro-' + campo).classList.add('visivel');
+          ok = false;
+        }
+      });
+    }
+    return ok;
+  }
+
+  function verResultado() {
+    if (!validar(3)) return;
+
+    const nome = respostas['nome'] || 'você';
+
+    // Lógica de resultado baseada nas respostas
+    const dor = respostas['d1'] || '';
+    const custo = respostas['d2'] || '';
+    const tempo = respostas['d3'] || '';
+    const registra = respostas['g1'] || '';
+    const sobrou = respostas['g2'] || '';
+    const identifica = respostas['g3'] || '';
+    const decide = respostas['e1'] || '';
+    const travada = respostas['e2'] || '';
+    const impede = respostas['e3'] || '';
+
+    // DOR
+    let dorTitulo = 'O problema que está pesando';
+    let dorTexto = '';
+
+    if (dor.includes('lucro')) {
+      dorTexto = 'Você sente que vende, trabalha e se esforça — mas não consegue confirmar se está realmente lucrando. Esse é um dos sinais mais claros de que o negócio está operando sem dado organizado.';
+    } else if (dor.includes('mão')) {
+      dorTexto = 'Você está carregando o negócio inteiro na sua memória e na sua força de vontade. Quando o processo depende só de você, ele quebra quando você para — e isso é insustentável.';
+    } else if (dor.includes('decisões')) {
+      dorTexto = 'Você precisa decidir com frequência, mas sem dado confiável na mão, cada decisão parece um risco. Isso gera desgaste e insegurança — mesmo quando você conhece bem o seu negócio.';
+    } else {
+      dorTexto = 'O dinheiro some sem explicação — e isso é quase sempre sinal de que as informações financeiras do negócio não estão organizadas num lugar só, separadas das despesas pessoais.';
+    }
+
+    // DADO
+    let dadoTitulo = 'O que o dado já revela';
+    let dadoTexto = '';
+
+    if (registra.includes('hábito')) {
+      dadoTexto = 'Você já registra — e isso é um ponto de partida poderoso. O trabalho aqui não é criar do zero, é organizar o que já existe de um jeito que te ajude a decidir.';
+    } else if (registra.includes('Às vezes')) {
+      dadoTexto = 'Você registra quando lembra — o que significa que o dado existe, mas está fragmentado. O desafio não é a falta de informação, é a falta de consistência no registro.';
+    } else {
+      dadoTexto = 'Tudo está na sua cabeça — e isso é mais comum do que parece. O problema é que memória não escala: quando o negócio cresce, o que você guarda mentalmente começa a falhar.';
+    }
+
+    if (!sobrou.includes('exatamente')) {
+      dadoTexto += ' E o fato de você não saber com certeza quanto sobrou no mês passado confirma que ainda falta um processo simples de registro financeiro.';
+    }
+
+    // DECISÃO
+    let decTitulo = 'Por onde começar agora';
+    let decTexto = '';
+
+    if (impede.includes('onde começar')) {
+      decTexto = 'O primeiro passo é mais simples do que parece: antes de qualquer sistema ou ferramenta, você precisa entender qual é a sua dor real — não o sintoma, mas o que está por trás dele. É isso que define por onde começar.';
+    } else if (impede.includes('tempo')) {
+      decTexto = 'O problema não é falta de tempo — é falta de processo. Um método simples que cabe na sua rotina real já muda tudo. Você não precisa de um dia livre pra organizar: precisa de 15 minutos por semana nos lugares certos.';
+    } else if (impede.includes('medo')) {
+      decTexto = 'O medo de olhar pros números é mais comum do que você imagina — e quase sempre o que se encontra não é tão assustador quanto parece. O que paralisa é a incerteza, não a realidade.';
+    } else {
+      decTexto = 'Você não precisa de um sistema caro pra ter clareza. Precisa de um método que organize o que já existe, mostre o que está travando e diga o que fazer primeiro — com o que você já tem.';
+    }
+
+    // INSIGHT
+    let insight = '';
+    if (decide.includes('eu acho') || decide.includes('Evito')) {
+      insight = `${nome}, o padrão que aparece no seu diagnóstico é claro: você tem um negócio funcionando, mas está operando sem dado organizado pra sustentar as decisões. Isso não é falta de capacidade — é falta de processo. E processo é exatamente o que muda quando você para de decidir no "eu acho que" e começa a decidir com o número certo na mão.`;
+    } else if (decide.includes('intuição')) {
+      insight = `${nome}, sua intuição sobre o negócio é um ativo real — mas ela fica muito mais poderosa quando combinada com dado. O que aparece no seu diagnóstico é que você já tem conhecimento do negócio; o que falta é um registro consistente que transforme esse conhecimento em decisão segura.`;
+    } else {
+      insight = `${nome}, você já tem uma base — o que aparece no seu diagnóstico é que o próximo passo é organizar o que já existe de um jeito que te dê clareza rápida na hora de decidir. Você não está longe: está a um processo de distância.`;
+    }
+
+    // Montar resultado na tela
+    document.getElementById('res-titulo').textContent = nome + ', seu diagnóstico está pronto.';
+    document.getElementById('res-nome-sub').textContent = 'Veja o que encontrei sobre o seu negócio agora.';
+    document.getElementById('res-dor-titulo').textContent = dorTitulo;
+    document.getElementById('res-dor-texto').textContent = dorTexto;
+    document.getElementById('res-dado-titulo').textContent = dadoTitulo;
+    document.getElementById('res-dado-texto').textContent = dadoTexto;
+    document.getElementById('res-dec-titulo').textContent = decTitulo;
+    document.getElementById('res-dec-texto').textContent = decTexto;
+    document.getElementById('res-insight').textContent = insight;
+
+    // Esconder formulário e mostrar resultado
+    document.getElementById('hero-topo').style.display = 'none';
+    document.getElementById('form-container').style.display = 'none';
+    document.getElementById('progresso-fill').style.width = '100%';
+    document.getElementById('resultado').classList.add('visivel');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Salvar no Firebase
+    try {
+      const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+      await addDoc(collection(window._db, 'leads_mini_diagnostico'), {
+        nome: respostas['nome'],
+        whatsapp: respostas['whatsapp'],
+        origem: 'mini-diagnostico',
+        // Dor
+        dor_principal: respostas['d1'],
+        dor_custo: respostas['d2'],
+        dor_tempo: respostas['d3'],
+        // Dado
+        dado_registra: respostas['g1'],
+        dado_sobrou: respostas['g2'],
+        dado_identifica: respostas['g3'],
+        // Decisão
+        decisao_base: respostas['e1'],
+        decisao_travada: respostas['e2'],
+        decisao_impede: respostas['e3'],
+        // Resultado gerado
+        resultado_dor: dorTexto,
+        resultado_dado: dadoTexto,
+        resultado_decisao: decTexto,
+        resultado_insight: insight,
+        status: 'aguardando_contato',
+        timestamp: serverTimestamp()
+      });
+    } catch(e) {
+      console.log('Firebase:', e);
+    }
+  }
+</script>
+</body>
+</html>

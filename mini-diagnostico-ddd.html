@@ -472,11 +472,28 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Firebase
-    salvarFirebase(nome, dorTexto, dadoTexto, decTexto, insight);
+    salvarFirebase();
   }
 
-  function salvarFirebase(nome, dorTexto, dadoTexto, decTexto, insight) {
+  function salvarFirebase() {
     try {
+      var dados = {
+        nome: respostas['nome'] || '',
+        whatsapp: respostas['whatsapp'] || '',
+        origem: 'mini-diagnostico',
+        dor_principal: respostas['d1'] || '',
+        dor_custo: respostas['d2'] || '',
+        dor_tempo: respostas['d3'] || '',
+        dor_tentou: respostas['d4'] || '',
+        dado_registra: respostas['g1'] || '',
+        dado_sobrou: respostas['g2'] || '',
+        dado_identifica: respostas['g3'] || '',
+        decisao_base: respostas['e1'] || '',
+        decisao_travada: respostas['e2'] || '',
+        decisao_impede: respostas['e3'] || '',
+        status: 'aguardando_contato'
+      };
+
       var script = document.createElement('script');
       script.type = 'module';
       script.textContent = `
@@ -491,22 +508,10 @@
           appId: "1:719149040677:web:47e65c4ba4a93422766bcc"
         });
         const db = getFirestore(app);
-        addDoc(collection(db, 'leads_mini_diagnostico'), ${JSON.stringify({
-          nome: respostas['nome'],
-          whatsapp: respostas['whatsapp'],
-          origem: 'mini-diagnostico',
-          dor_principal: respostas['d1'],
-          dor_custo: respostas['d2'],
-          dor_tempo: respostas['d3'],
-          dor_tentou: respostas['d4'],
-          dado_registra: respostas['g1'],
-          dado_sobrou: respostas['g2'],
-          dado_identifica: respostas['g3'],
-          decisao_base: respostas['e1'],
-          decisao_travada: respostas['e2'],
-          decisao_impede: respostas['e3'],
-          status: 'aguardando_contato'
-        })}).then(() => console.log('Salvo!')).catch(e => console.log('Erro Firebase:', e));
+        addDoc(collection(db, 'leads_mini_diagnostico'), {
+          ...${JSON.stringify(dados)},
+          timestamp: serverTimestamp()
+        }).then(() => console.log('Lead salvo!')).catch(e => console.log('Erro Firebase:', e));
       `;
       document.body.appendChild(script);
     } catch(e) {

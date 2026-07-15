@@ -101,6 +101,7 @@
     </div>
     <div class="pergunta"><label class="pergunta-label">Seu nome</label><input type="text" id="nome" placeholder="Como você gostaria de ser chamada"/><span class="msg-erro" id="erro-nome">Por favor, informe seu nome.</span></div>
     <div class="pergunta"><label class="pergunta-label">Seu WhatsApp</label><input type="tel" id="whatsapp" placeholder="(11) 99999-9999"/><span class="msg-erro" id="erro-whatsapp">Por favor, informe seu WhatsApp.</span></div>
+    <div class="pergunta"><label class="pergunta-label">Seu @ no Instagram <span style="font-size:12px;color:var(--cinza-medio);font-weight:400">(opcional)</span></label><input type="text" id="instagram" placeholder="@seuperfil"/></div>
     <div class="botoes"><button class="btn-avancar" onclick="avancar(0)">Começar →</button></div>
   </div>
   <div class="bloco" id="bloco-1">
@@ -208,7 +209,7 @@
       <h3 class="cta-resultado-titulo">Quer ir mais fundo?</h3>
       <p class="cta-resultado-sub">No Diagnóstico DDD eu analiso o seu negócio pessoalmente e entrego um caminho completo do que fazer primeiro — em áudio, PDF e videochamada comigo.</p>
       <div class="cta-resultado-preco"><span class="preco-riscado">R$997</span> <span class="preco-atual">R$497</span> · Entrega em até 48h úteis</div>
-      <a href="https://pay.kiwify.com.br/pGDld17" target="_blank" class="cta-resultado-btn">Quero meu Diagnóstico completo →</a>
+      <a href="javascript:void(0)" onclick="registrarClique()" class="cta-resultado-btn">Quero meu Diagnóstico completo →</a>
     </div>
     <div class="divisor"></div>
     <div class="rodape">KlareIA · Karen Scorse · Gestão com IA e Dados</div>
@@ -271,9 +272,10 @@
     if(b===0){
       var n=document.getElementById('nome').value.trim();
       var w=document.getElementById('whatsapp').value.trim();
+      var ig=document.getElementById('instagram').value.trim();
       if(!n){document.getElementById('erro-nome').classList.add('visivel');v=false;}
       if(!w){document.getElementById('erro-whatsapp').classList.add('visivel');v=false;}
-      if(n)R.nome=n;if(w)R.whatsapp=w;
+      if(n)R.nome=n;if(w)R.whatsapp=w;if(ig)R.instagram=ig;
     }
     var m={1:['d1','d2','d3','d4','d5'],2:['g1','g2','g3'],3:['e1','e2','e3']};
     if(m[b])m[b].forEach(function(c){if(!R[c]){document.getElementById('erro-'+c).classList.add('visivel');v=false;}});
@@ -310,14 +312,40 @@
     window.scrollTo({top:0,behavior:'smooth'});
 
     db.collection('leads_mini_diagnostico').add({
-      nome:R.nome||'',whatsapp:R.whatsapp||'',origem:'mini-diagnostico',
+      nome:R.nome||'',whatsapp:R.whatsapp||'',instagram:R.instagram||'',origem:'mini-diagnostico',
       dor_principal:R.d1||'',dor_custo:R.d2||'',dor_tempo:R.d3||'',
       dor_tentou:R.d4||'',dor_expectativa:R.d5||'',
       dado_registra:R.g1||'',dado_sobrou:R.g2||'',dado_identifica:R.g3||'',
       decisao_base:R.e1||'',decisao_travada:R.e2||'',decisao_impede:R.e3||'',
       status:'aguardando_contato',
+      eventos:{formulario_preenchido: new Date().toISOString()},
       timestamp:firebase.firestore.FieldValue.serverTimestamp()
-    }).then(function(){console.log('Lead salvo!');}).catch(function(e){console.log('Erro:',e);});
+    }).then(function(docRef){
+      window._leadId = docRef.id;
+      console.log('Lead salvo! ID:', docRef.id);
+    }).catch(function(e){console.log('Erro:',e);});
+  }
+
+  function registrarClique(){
+    var url = 'https://pay.kiwify.com.br/pGDld17';
+    // Rastreia o clique no Firebase
+    if(window._leadId){
+      db.collection('leads_mini_diagnostico').doc(window._leadId).update({
+        'eventos.clicou_comprar': new Date().toISOString(),
+        status: 'clicou_comprar'
+      }).then(function(){
+        console.log('Clique registrado!');
+      }).catch(function(e){console.log('Erro ao registrar clique:',e);});
+    } else {
+      // Se não tem leadId (lead novo que ainda não salvou), salva o clique mesmo assim
+      db.collection('eventos_anonimos').add({
+        evento: 'clicou_comprar',
+        origem: 'mini-diagnostico',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    // Abre o Kiwify
+    window.open(url, '_blank');
   }
 </script>
 </body>

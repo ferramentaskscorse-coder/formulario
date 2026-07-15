@@ -694,7 +694,14 @@
               <div class="lead-meta">
                 <span>📱 ${lead.whatsapp || '—'}</span>
                 <span>🏪 ${lead.negocio || '—'}</span>
+                ${lead.instagram ? `<span>📸 ${lead.instagram}</span>` : ''}
                 <span>📅 ${data}</span>
+                <span style="color:${lead.origem==='mini-diagnostico'?'#7B9E87':'#BE4D00'};font-weight:600">● ${lead.origem==='mini-diagnostico'?'Mini Diagnóstico':'Diagnóstico DDD'}</span>
+              </div>
+              <div class="lead-meta" style="margin-top:6px;gap:16px">
+                <span style="font-size:11px">📋 Preencheu ${lead.eventos&&lead.eventos.formulario_preenchido?'✅':'—'}</span>
+                <span style="font-size:11px">💳 Clicou comprar ${lead.eventos&&lead.eventos.clicou_comprar?'✅':'—'}</span>
+                <span style="font-size:11px">🎯 Comprou ${lead.status==='converteu'?'✅':'—'}</span>
               </div>
             </div>
             <span class="lead-status-badge badge-${status}">${statusLabel(status)}</span>
